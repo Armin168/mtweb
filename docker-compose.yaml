@@ -1,0 +1,28 @@
+version: '3'
+
+networks:
+  local:
+    name: local
+
+services:
+  traefik:
+    image: traefik:2.7
+    command:
+      - --providers.docker
+    ports:
+      - 80:80
+      - 8080:8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./config:/etc/traefik
+    networks:
+      - local
+
+  nginx:
+    image: nginx:1.21.6-alpine
+    networks:
+      - local
+  whoami:
+    image: traefik/whoami
+    networks:
+      - local

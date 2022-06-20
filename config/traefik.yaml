@@ -1,0 +1,43 @@
+entryPoints:
+  http:
+    address: :80
+    # proxyProtocol:
+    #   insecure: true
+    forwardedHeaders:
+      insecure: true
+
+api:
+  insecure: true
+  dashboard: true
+
+providers:
+  file:
+    directory: /etc/traefik
+    watch: true
+
+http:
+  routers:
+    whoami:
+      rule: 'Path(`/whoami`)'
+      middlewares: s1
+      service: whoami
+    nginx:
+      rule: 'Path(`/nginx`)'
+      middlewares:
+        - s1
+      service: nginx
+
+  middlewares:
+    s1:
+      stripprefix:
+        prefixes: /nginx
+
+  services:
+    whoami:
+      loadBalancer:
+        servers:
+          - url: http://whoami
+    nginx:
+      loadBalancer:
+        servers:
+          - url: http://nginx
